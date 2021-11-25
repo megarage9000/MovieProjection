@@ -26,28 +26,35 @@ def is_adult_by_num_rated_and_rating(data):
 
 def multi_classifiers(X, y):
     X_train, X_valid, y_train, y_valid = train_test_split(X, y)
+
     gauss_model = GaussianNB()
     gauss_model.fit(X_train, y_train)
     print("Gauss:", gauss_model.score(X_valid, y_valid))
+
     # calculated based on running the model on everything between 1 and 300
     neighbours_model = KNeighborsClassifier(56)
     neighbours_model.fit(X_train, y_train)
     print("K Neighbours:", neighbours_model.score(X_valid, y_valid))
+
     random_forest_model = RandomForestClassifier(n_estimators=100)
     random_forest_model.fit(X_train, y_train)
     print("Random Forest:", random_forest_model.score(X_valid, y_valid))
-    artificial_intel = MLPClassifier(hidden_layer_sizes=(20))
-    artificial_intel.fit(X_train, y_train)
-    print("Machine Learning:", artificial_intel.score(X_valid, y_valid))
+
+    artificial_intel_model = MLPClassifier(hidden_layer_sizes=(20))
+    artificial_intel_model.fit(X_train, y_train)
+    print("Machine Learning:", artificial_intel_model.score(X_valid, y_valid))
+
     sc = StackingClassifier(
         estimators=[
             ("gauss", gauss_model),
             ("kn", neighbours_model),
             ("rf", random_forest_model),
-            ("ai", artificial_intel)]
+            ("ai", artificial_intel_model)]
     )
     sc.fit(X_train, y_train)
     print("StackingClassifier:", sc.score(X_valid, y_valid))
+
+    return gauss_model, neighbours_model, random_forest_model, artificial_intel_model
 
 
 def equalize_adult_non_adult(data):
