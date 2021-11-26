@@ -9,19 +9,20 @@ from sklearn.ensemble import RandomForestClassifier, StackingClassifier
 def is_adult_by_rating(data):
     X = data[['averageRating']].values
     y = data['isAdult'].values
-    multi_classifiers(X, y)
+    return multi_classifiers(X, y)
+
 
 def is_adult_by_num_rated(data):
     X = data[['numVotes']].values
     y = data['isAdult'].values
-    multi_classifiers(X, y)
+    return multi_classifiers(X, y)
 
 
 def is_adult_by_num_rated_and_rating(data):
 
     X = data.filter(['numVotes','averageRating']).to_numpy()
     y = data['isAdult'].values
-    multi_classifiers(X, y)
+    return multi_classifiers(X, y)
 
 
 def multi_classifiers(X, y):
@@ -75,6 +76,20 @@ def get_ratings_from_file():
     return combined_adult_ratings
 
 
+def ui_helper():
+    combined_adult_ratings = get_ratings_from_file()
+
+    # Classifiers got confused when 98.6% of all results were non-adult classification
+    #   and they just started guessing always true for that question
+    equalized_rows = equalize_adult_non_adult(combined_adult_ratings)
+
+    is_adult_by_rating_models = is_adult_by_rating(equalized_rows)
+    is_adult_by_num_rated_models = is_adult_by_num_rated(equalized_rows)
+    is_adult_by_num_rated_and_rating_models = is_adult_by_num_rated_and_rating(equalized_rows)
+
+    return is_adult_by_rating_models, is_adult_by_num_rated_models, is_adult_by_num_rated_and_rating_models
+
+
 def main():
 
     combined_adult_ratings = get_ratings_from_file()
@@ -89,7 +104,6 @@ def main():
     is_adult_by_num_rated(equalized_rows)
     print("\nAsks various classifiers to decide if a movie is adult based on how many people rated it and its rating")
     is_adult_by_num_rated_and_rating(equalized_rows)
-
 
 
 main()
