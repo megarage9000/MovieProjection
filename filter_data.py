@@ -11,17 +11,15 @@ def main():
 
 
 def getTconstsAndSave(file_name):
-    data = pd.read_csv(file_name, sep='\t')
+    data = pd.read_csv(file_name, sep='\t', na_values='\\N')
     movies_only = data[(data["titleType"] == "movie") | (data["titleType"] == "tvMovie")].drop(columns = ["endYear", "titleType"])
     movies_only.to_csv("filtered_"+file_name+".csv")
-    movies_only.replace("\\N", np.nan)
     t_consts = movies_only["tconst"].to_numpy()
     return t_consts
 
 def filterbyTConst(tconst_arr, file_name, col_name):
-    frame = pd.read_csv(file_name, sep='\t')
+    frame = pd.read_csv(file_name, sep='\t', na_values='\\N')
     frame = frame[frame[col_name].isin(tconst_arr)]
-    frame.replace("\\N", np.nan)
     frame.to_csv("filtered_"+file_name+".csv")
 
 main()
