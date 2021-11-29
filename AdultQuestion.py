@@ -55,7 +55,7 @@ def multi_classifiers(X, y):
     sc.fit(X_train, y_train)
     print("StackingClassifier:", sc.score(X_valid, y_valid))
 
-    return gauss_model, neighbours_model, random_forest_model, artificial_intel_model
+    return (X_valid, y_valid), gauss_model, neighbours_model, random_forest_model, artificial_intel_model, sc
 
 
 def equalize_adult_non_adult(data):
@@ -106,4 +106,5 @@ def main():
     is_adult_by_num_rated_and_rating(equalized_rows)
 
 
-main()
+if __name__ == "__main__":
+    main()
