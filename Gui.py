@@ -15,8 +15,10 @@ def main_page():
 
 
 def classifier_page():
-    models = ui_helper()
     frm = ttk.Frame(root, padding=10)
+    ttk.Label(frm, text="This command will take a while").grid(column=2, row=0)
+    models = ui_helper()
+    frm = ttk.Frame(Tk(className="Is the Movie an Adult Film"), padding=10)
     frm.grid()
     ttk.Label(frm, text="By Average Rating").grid(column=0, row=0)
     classifier_tab(frm, 1, models[0])
@@ -44,5 +46,5 @@ def classifier_tab(frm, start_row, models):
     ttk.Label(frm, text=models[5].score(x_valid, y_valid)).grid(column=1, row=start_row + 4)
 
 
-root = Tk()
+root = Tk(className="Movie Data Comparator")
 main_page()
