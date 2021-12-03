@@ -9,24 +9,23 @@ def main_page():
     frm.grid()
     ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
     ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1, row=0)
-    ttk.Label(frm, text="Ask Q").grid(column=0, row=2)
-    ttk.Button(frm, text="Ask About Adult Movies", command=classifier_page).grid(column=1, row=2)
+    ttk.Button(frm, text="Ask About Adult Movies", command=classifier_page).grid(column=0, row=2)
+    ttk.Button(frm, text="Ask If a Movie is Adult", command=question_page).grid(column=0, row=3)
     root.mainloop()
 
 
 def classifier_page():
     frm = ttk.Frame(root, padding=10)
     ttk.Label(frm, text="This command will take a while").grid(column=2, row=0)
-    models = ui_helper()
     frm = ttk.Frame(Tk(className="Is the Movie an Adult Film"), padding=10)
     frm.grid()
     ttk.Label(frm, text="By Average Rating").grid(column=0, row=0)
-    classifier_tab(frm, 1, models[0])
+    classifier_tab(frm, 1, classifiers_by_rating)
     ttk.Label(frm, text="By Number of Ratings").grid(column=0, row=6)
-    classifier_tab(frm, 7, models[1])
+    classifier_tab(frm, 7, classifiers_by_num_rating)
     ttk.Label(frm, text="By Both Average Rating and Number of Ratings").grid(column=0, row=12)
-    classifier_tab(frm, 13, models[2])
-    pass
+    classifier_tab(frm, 13, classifiers_by_rating_num_ratings)
+
 
 def classifier_tab(frm, start_row, models):
     x_valid, y_valid = models[0]
@@ -46,5 +45,10 @@ def classifier_tab(frm, start_row, models):
     ttk.Label(frm, text=models[5].score(x_valid, y_valid)).grid(column=1, row=start_row + 4)
 
 
+def question_page():
+    pass
+
+
+classifiers_by_rating, classifiers_by_num_rating, classifiers_by_rating_num_ratings = ui_helper()
 root = Tk(className="Movie Data Comparator")
 main_page()
