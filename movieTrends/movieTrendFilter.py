@@ -17,12 +17,12 @@ def main():
     movie_ratings = pd.read_csv('../filtered_title.ratings.tsv.gz.csv')
     names = pd.read_csv('../filtered_name.tsv.gz.csv')
     result_csv = load_data(movie_data, movie_principals, names, movie_ratings)
-    convertCategorialToNumeric(result_csv)
-    result_csv.to_csv('../movie_trends_data.csv')
+    result_csv = result_csv.fillna(0)
+    print(result_csv.isna().sum())
+    result_csv = result_csv[result_csv.columns.difference(['tconst', 'nconst', 'numVotes', 'primaryTitle', 'category'])]
+    print(result_csv.columns.values)
+    result_csv.to_csv('../movie_trends_data.csv', index=False)
 
-# Search up how to convert categorial data for regression
 
-def convertCategorialToNumeric(basics):
-    print(basics.dtypes)
 
 main()

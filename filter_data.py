@@ -28,6 +28,6 @@ def filterNames():
     names['professions'] = names['primaryProfession'].str.split(',')
     names = names.explode('professions')
     names = names[['nconst', 'primaryName', 'professions']]
-    names.to_csv('filtered_name.tsv.gz.csv')
+    names.to_csv('filtered_name.tsv.gz.csv', index=False)
 
 main()
