@@ -4,8 +4,10 @@ import tensorflow as tf
 from tensorflow import keras
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
 # Most code borrowed from "Hands-on Machine Learning with Scikit-learn, Keras, and Tensorflow 2nd Edition"
 NUM_CAT = 3
+BATCH_SIZE = 400
 
 
 def getTrainModel(movie_data):
@@ -50,23 +52,29 @@ def createModel(X_data):
     # Get numerical inputs
     num_numerical = len(X_data.columns) - NUM_CAT
     numerical_inputs = keras.layers.Input(shape=[num_numerical], dtype=tf.float64)
-    layer_num_1 = keras.layers.Dense(30, activation="sigmoid")(numerical_inputs)
+    layer_num_1 = keras.layers.Dense(BATCH_SIZE, activation="relu")(numerical_inputs)
+    layer_num_2 = keras.layers.Dense(BATCH_SIZE, activation="sigmoid")(layer_num_1)
 
     # Get categorical inputs (genres, startYear, isAdult)
-    genre_embed_layer, genre_inputs = setupCategorialLayer(X_data, 'genres', 2, 3)
-    start_year_embed_layer, start_year_inputs = setupCategorialLayer(X_data, 'startYear', 2, 3)
-    is_adult_embed_layer, is_adult_inputs = setupCategorialLayer(X_data, 'isAdult', 2, 3)
-    embedded_layers = keras.layers.concatenate([genre_embed_layer, start_year_embed_layer, is_adult_embed_layer])
+    categorical_inputs_names = ['genres', 'startYear', 'isAdult']
+    categorical_inputs = list()
+    categorical_embedded_layers = list()
+    for category in categorical_inputs_names:
+        embed_layer, cat_input = setupCategorialLayer(X_data, category, 2, 3)
+        categorical_inputs.append(cat_input)
+        categorical_embedded_layers.append(embed_layer)
+    embedded_layers = keras.layers.concatenate(categorical_embedded_layers)
 
     # Apply layers on embedded
-    embed_sigmoid_layer = keras.layers.Dense(30, activation="sigmoid")(embedded_layers)
+    embed_sigmoid_layer = keras.layers.Dense(BATCH_SIZE, activation="sigmoid")(embedded_layers)
     flattened_layer = keras.layers.Flatten()(embed_sigmoid_layer)
+
     # Concatenate the inputs
-    all_inputs = keras.layers.concatenate([layer_num_1, flattened_layer])
+    all_inputs = keras.layers.concatenate([layer_num_2, flattened_layer])
 
     # Dense inputs to one
     rating_output = keras.layers.Dense(1)(all_inputs)
-    movie_rating_model = keras.models.Model(inputs=[numerical_inputs, genre_inputs, start_year_inputs, is_adult_inputs], outputs=[rating_output])
+    movie_rating_model = keras.models.Model(inputs=[numerical_inputs, categorical_inputs], outputs=[rating_output])
     movie_rating_model.compile(loss=keras.losses.MeanAbsoluteError(), optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
 
     return movie_rating_model
@@ -92,25 +100,22 @@ def setupCategorialLayer(data, name, number_oov, dimension_size):
     embedded_layer = keras.layers. \
         Embedding(input_dim=len(category_values) + number_oov, output_dim=dimension_size) \
         (category_indices)
-    flatten_layer = keras.layers.Flatten()(embedded_layer)
+    relu_layer = keras.layers.Dense(BATCH_SIZE, activation='relu')(embedded_layer)
     # Return the embedded layer along with the input layer
-    return flatten_layer, categories
+    return relu_layer, categories
 
 
 def main():
     movie_data = pd.read_csv('../filtered_title.basics.tsv.gz.csv')
     ratings = pd.read_csv('../filtered_title.ratings.tsv.gz.csv')
     movie_data = movie_data.merge(ratings, on=['tconst'])
+
     # Start with basic data first
     movie_data = movie_data[['startYear', 'runtimeMinutes', 'isAdult', 'genres', 'averageRating']]
     movie_data['startYear'].fillna("Unknown", inplace=True)
-    movie_data['runtimeMinutes'].fillna(0, inplace=True)
+    movie_data['runtimeMinutes'].fillna(-1, inplace=True)
     movie_data['genres'].fillna("Unknown", inplace=True)
     resulting_model = getTrainModel(movie_data)
-    test_rating = resulting_model.predict(
-        [2000, 160, 1, 'Action']
-    )
-    print("test rating = " + str(test_rating))
 
 
 main()
