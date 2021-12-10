@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 
 CATEGORIES = ['titleType', 'startYear', 'genres', 'language', 'region']
 NUM_CAT = len(CATEGORIES)
-NUM_EPOCHS = 15
+NUM_EPOCHS = 2
 LEARNING_RATE = 0.01
 
 def getTrainModel(movie_data):
@@ -35,7 +35,7 @@ def getTrainModel(movie_data):
     print(test)
 
     print('saving model...')
-    model.save('models/NN_film_trends')
+    model.save('models/NN_film_trends_with_na')
 
     return result
 
@@ -73,7 +73,9 @@ def exp_decay(lr0, s):
 def setupCategorialLayer(data, name, number_oov):
 
     # Create input layer for these values
-    cat_values = data[name].unique().astype(str)
+    cat_values = np.unique(data[name].astype(str).to_numpy())
+    print('unique values for ' + name + ': ')
+    print(cat_values)
     num_cat_values = len(cat_values)
     input_cat = tf.keras.layers.Input(shape=[], dtype=tf.string)
     cat_val_lookup = tf.keras.layers.StringLookup(
@@ -99,7 +101,7 @@ def applyLayers(layers):
                                    kernel_initializer='he_normal',
                                    use_bias=False)(batch_2)
     batch_3 = keras.layers.BatchNormalization()(elu_layer)
-    drop = keras.layers.Dropout(rate=0.03)(batch_3)
+    drop = keras.layers.Dropout(rate=0.3)(batch_3)
     final_layer = keras.layers.Dense(32)(drop)
     return final_layer
 

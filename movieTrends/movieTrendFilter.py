@@ -12,11 +12,23 @@ def main():
     movie_data = movie_data.merge(akas, on=['tconst'])
 
     movie_data = movie_data[['titleType', 'startYear', 'genres', 'language', 'region', 'averageRating']]
-    movie_data = movie_data.dropna()
+
+    # Removing NaN data
+    # movie_data = movie_data.dropna()
+
+    # Including NaN data
+    movie_data = movie_data.fillna({
+        'titleType': 'unknown',
+        'startYear': 'unknown',
+        'genres': 'unknown',
+        'language': 'unknown',
+        'region': 'unknown'
+    })
     for category in categories:
         movie_data[category] = movie_data[category].astype(str).str.lower()
 
     print(movie_data.isna().sum())
+    print(movie_data.shape)
     movie_data.to_csv('film_trend_data.csv', index=False)
 
 # Do some feature engineering here!
