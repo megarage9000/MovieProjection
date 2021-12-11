@@ -31,5 +31,5 @@ def main():
     print(movie_data.shape)
     movie_data.to_csv('film_trend_data.csv', index=False)
 
-# Do some feature engineering here!
+
 main()

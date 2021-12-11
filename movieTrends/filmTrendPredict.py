@@ -1,14 +1,19 @@
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-import sys
-
 
 def main():
     showHelp()
+    path = ''
+    whichModel = input("Use model with Imputed NaN values?(Y/N)")
+    whichModel = whichModel.lower()
+    if whichModel == 'y':
+        path = 'models/NN_film_trends_with_na'
+    else:
+        path = 'models/NN_film_trends_without_na'
+        print("Loading Tensorflow model...")
+    model = tf.keras.models.load_model(path)
     data, data_tf = getInput()
-    print("Loading Tensorflow model...")
-    model = tf.keras.models.load_model('models/NN_film_trends_without_na')
     result = model.predict(data_tf)
     print('Estimated rating for ' + str(data) + ': ' + str(result[0][0]))
 
@@ -34,7 +39,6 @@ def getInput():
     return data, data_tf
 
 
-# need to a set of vals
 def packagevals(data):
     data_for_tf = np.split(data, len(data), axis=0)
     return data_for_tf
