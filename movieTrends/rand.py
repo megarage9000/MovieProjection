@@ -12,6 +12,7 @@ NUM_CAT = len(CATEGORIES)
 NUM_EPOCHS = 15
 LEARNING_RATE = 0.01
 
+
 def getTrainModel(movie_data):
     X_data = movie_data[movie_data.columns.difference(['averageRating'])]
     y_data = movie_data[['averageRating']]
@@ -25,21 +26,22 @@ def getTrainModel(movie_data):
     X_valid = X_valid.to_numpy().astype(str)
     X_test = X_test.to_numpy().astype(str)
 
-    print(X_train[:, :1])
+    print(X_train[0])
+    print(X_train[0].shape)
 
     exp_decay_fn = exp_decay(lr0=LEARNING_RATE, s=NUM_EPOCHS)
     lr_scheduler = keras.callbacks.LearningRateScheduler(exp_decay_fn)
 
-    model.summary()
-    result = model.fit(np.split(X_train, NUM_CAT, axis=1), y_train, epochs=NUM_EPOCHS,
-                       validation_data=(np.split(X_valid, NUM_CAT, axis=1), y_valid), callbacks=[lr_scheduler])
-    test = model.evaluate(np.split(X_test, NUM_CAT, axis=1), y_test)
-    print(test)
-
-    print('saving model...')
-    model.save('models/NN_film_trends_without_na')
-
-    return result
+    # model.summary()
+    # result = model.fit(np.split(X_train, NUM_CAT, axis=1), y_train, epochs=NUM_EPOCHS,
+    #                    validation_data=(np.split(X_valid, NUM_CAT, axis=1), y_valid), callbacks=[lr_scheduler])
+    # test = model.evaluate(np.split(X_test, NUM_CAT, axis=1), y_test)
+    # print(test)
+    #
+    # print('saving model...')
+    # model.save('models/NN_film_trends_without_na')
+    #
+    # return result
 
 
 def createModel(X_data):
@@ -68,12 +70,12 @@ def createModel(X_data):
 # From Hands-on-ML, exponential scheduling
 def exp_decay(lr0, s):
     def exp_decay_fn(epoch):
-        return lr0 * 0.1**(epoch / s)
+        return lr0 * 0.1 ** (epoch / s)
+
     return exp_decay_fn
 
 
 def setupCategorialLayer(data, name, number_oov):
-
     # Create input layer for these values
     cat_values = np.unique(data[name].astype(str).to_numpy())
     print('unique values for ' + name + ': ')
@@ -107,6 +109,7 @@ def applyLayers(layers):
     final_layer = keras.layers.Dense(32)(drop)
     return final_layer
 
+
 def main():
     movie_data = processData()
     print(movie_data.shape)
@@ -117,4 +120,9 @@ def processData():
     movie_data = pd.read_csv('film_trend_data.csv')
     return movie_data
 
+
 main()
+
+[['action' 'en' 'en' '1999' 'movie']]
+[array([['action', 'en', 'en', '1999', 'movie']], dtype='<U6')]
+Entered data = [array([['action', 'en', 'en', '1999', 'movie']], dtype='<U6')

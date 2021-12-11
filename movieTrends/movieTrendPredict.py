@@ -6,24 +6,38 @@ import sys
 
 def main():
     showHelp()
-    getInput()
-
+    data, data_tf = getInput()
+    print("Loading Tensorflow model...")
+    model = tf.keras.models.load_model('models/NN_film_trends_without_na')
+    result = model.predict(data_tf)
+    print('Estimated rating for ' + str(data) + ': ' + str(result[0][0]))
 
 def getInput():
-    titleType = input("Enter a title type input: ")
+    titleType = str(input("Enter a title type input: "))
+    if titleType == 'test':
+        print("Using default test data...")
+        res = np.array(['fantasy,horror,thriller', 'ja', 'jp' ,'2001.0','tvmovie'])
+        res_tf = np.expand_dims(res, axis=0)
+        res_tf = np.split(res_tf, 5, axis=1)
+        return res, res_tf
     print("- Entered title type = " + titleType)
-    year = input("Enter a year input: ")
+    year = str(input("Enter a year input: "))
     print("- Entered year = " + year)
-    genres = input("Enter a genres input(if multiple, at most 3 and separate by comma): ")
+    genres = str(input("Enter a genres input(if multiple, at most 3 and separate by comma): "))
     print("- Entered genres = " + genres)
-    genres = np.array(genres.lower().split(','))
-    language = input("Enter a language input: ")
+    language = str(input("Enter a language input: "))
     print("- Entered language = " + language)
-    region = input("Enter a region input: ")
+    region = str(input("Enter a region input: "))
     print("- Entered region = " + region)
-    data = np.array([titleType, year, genres, language, region], dtype=object)
-    print("Entered data = " + str(data))
-    return data
+    data = np.array([genres, language, region, year, titleType])
+    data_tf = packagevals(data)
+    return data, data_tf
+
+
+# need to a set of vals
+def packagevals(data):
+    data_for_tf = np.split(data, len(data), axis=0)
+    return data_for_tf
 
 
 def showHelp():
@@ -44,5 +58,6 @@ def showHelp():
     print(uniqueLanguages)
     print('Some regions example input: ')
     print(uniqueRegions)
+
 
 main()
