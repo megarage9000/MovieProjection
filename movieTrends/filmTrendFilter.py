@@ -13,11 +13,12 @@ def main():
 
     movie_data = movie_data[['titleType', 'startYear', 'genres', 'language', 'region', 'averageRating']]
 
-    for category in categories:
-        movie_data[category] = movie_data[category].astype(str).str.lower()
-
     # Removing NaN data
     movie_data_no_nan = movie_data.dropna()
+    for category in categories:
+        movie_data_no_nan[category] = movie_data_no_nan[category].astype(str).str.lower()
+        movie_data[category] = movie_data[category].astype(str).str.lower()
+    print(movie_data_no_nan.shape)
     movie_data_no_nan.to_csv('film_trend_data_no_nan.csv', index=False)
 
     # Including NaN data
@@ -28,10 +29,8 @@ def main():
         'language': 'unknown',
         'region': 'unknown'
     })
-    movie_data_with_nan.to_csv('film_trend_data_with_nan.csv', index=False)
-
     print(movie_data_with_nan.shape)
-    print(movie_data_no_nan.shape)
+    movie_data_with_nan.to_csv('film_trend_data_with_nan.csv', index=False)
 
 
 main()

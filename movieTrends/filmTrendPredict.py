@@ -3,16 +3,20 @@ import numpy as np
 import pandas as pd
 
 def main():
-    showHelp()
+
     path = ''
+    helppath = ''
     whichModel = input("Use model with Imputed NaN values?(Y/N)")
     whichModel = whichModel.lower()
     if whichModel == 'y':
         path = 'models/NN_film_trends_with_na'
+        helppath =
     else:
         path = 'models/NN_film_trends_without_na'
-        print("Loading Tensorflow model...")
+
+    print("Loading Tensorflow model...")
     model = tf.keras.models.load_model(path)
+    showHelp(helppath)
     data, data_tf = getInput()
     result = model.predict(data_tf)
     print('Estimated rating for ' + str(data) + ': ' + str(result[0][0]))
@@ -45,7 +49,7 @@ def packagevals(data):
     return data_for_tf
 
 
-def showHelp():
+def showHelp(filepath):
     print('Generating some example value types per category...')
     movie_data = pd.read_csv('film_trend_data.csv')
     uniqueTitleTypes = movie_data['titleType'].unique()
