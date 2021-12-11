@@ -15,7 +15,7 @@ NUM_CAT = len(CATEGORIES)
 NUM_EPOCHS = 15
 LEARNING_RATE = 0.01
 
-def getTrainModel(movie_data):
+def getTrainModel(movie_data, num_epochs, model_name):
     X_data = movie_data[movie_data.columns.difference(['averageRating'])]
     y_data = movie_data[['averageRating']]
 
@@ -24,22 +24,23 @@ def getTrainModel(movie_data):
     X_train, X_valid, y_train, y_valid = train_test_split(X_train_full, y_train_full)
     model = createModel(X_train)
     model.summary()
+
+
     X_train = X_train.to_numpy().astype(str)
     X_valid = X_valid.to_numpy().astype(str)
     X_test = X_test.to_numpy().astype(str)
 
     # Create the exponential learning scheduler
-    exp_decay_fn = exp_decay(lr0=LEARNING_RATE, s=NUM_EPOCHS)
+    exp_decay_fn = exp_decay(lr0=LEARNING_RATE, s=num_epochs)
     lr_scheduler = keras.callbacks.LearningRateScheduler(exp_decay_fn)
 
-    model.summary()
-    result = model.fit(np.split(X_train, NUM_CAT, axis=1), y_train, epochs=NUM_EPOCHS,
+    result = model.fit(np.split(X_train, NUM_CAT, axis=1), y_train, epochs=num_epochs,
                        validation_data=(np.split(X_valid, NUM_CAT, axis=1), y_valid), callbacks=[lr_scheduler])
     test = model.evaluate(np.split(X_test, NUM_CAT, axis=1), y_test)
     print(test)
 
     print('saving model...')
-    model.save('models/NN_film_trends_with_na')
+    model.save('models/' + model_name)
 
     return result
 
@@ -114,9 +115,17 @@ def applyLayers(layers):
     return final_layer
 
 def main():
-    movie_data = processData()
-    print(movie_data.shape)
-    resulting_model = getTrainModel(movie_data)
+
+    if_on_nan = input("Train with imputed NaN values(Y/N)? ")
+    if_on_nan = if_on_nan.lower()
+    if if_on_nan == 'y':
+        movie_data = pd.read_csv('film_trend_data_with_nan.csv')
+        print(movie_data.shape)
+        resulting_model = getTrainModel(movie_data, 2, 'NN_film_trends_with_na')
+    else:
+        movie_data = pd.read_csv('film_trend_data_no_nan.csv')
+        print(movie_data.shape)
+        resulting_model = getTrainModel(movie_data, 15, 'NN_film_trends_without_na')
 
 
 def processData():
