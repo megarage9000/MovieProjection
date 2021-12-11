@@ -10,9 +10,10 @@ def main():
     whichModel = whichModel.lower()
     if whichModel == 'y':
         path = 'models/NN_film_trends_with_na'
-        helppath =
+        helppath ='film_trend_data_with_nan.csv'
     else:
         path = 'models/NN_film_trends_without_na'
+        helppath = 'film_trend_data_no_nan.csv'
 
     print("Loading Tensorflow model...")
     model = tf.keras.models.load_model(path)
@@ -34,12 +35,14 @@ def getInput():
     year = str(year)
     print("- Entered year = " + year)
     genres = str(input("Enter a genres input(if multiple, at most 3 and separate by comma): "))
+    genres = genres.replace(" ", "")
     print("- Entered genres = " + genres)
     language = str(input("Enter a language input: "))
     print("- Entered language = " + language)
     region = str(input("Enter a region input: "))
     print("- Entered region = " + region)
     data = np.array([genres, language, region, year, titleType])
+    data = np.char.lower(data)
     data_tf = packagevals(data)
     return data, data_tf
 
