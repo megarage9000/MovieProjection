@@ -26,7 +26,8 @@ def getInput():
         res_tf = np.split(res_tf, 5, axis=1)
         return res, res_tf
     print("- Entered title type = " + titleType)
-    year = str(input("Enter a year input: "))
+    year = float(input("Enter a year input: "))
+    year = str(year)
     print("- Entered year = " + year)
     genres = str(input("Enter a genres input(if multiple, at most 3 and separate by comma): "))
     print("- Entered genres = " + genres)
